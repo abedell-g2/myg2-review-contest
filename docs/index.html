@@ -90,14 +90,19 @@
     .email-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .email-row input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-family: 'Figtree', sans-serif; outline: none; transition: border-color 0.15s; }
     .email-row input:focus { border-color: #6b4de6; }
-    .preview-link-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 12px; font-family: 'Figtree', sans-serif; color: #6b4de6; background: white; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
-    .preview-link-btn:hover { background: #f5f3ff; border-color: #c4b5fd; }
+    .preview-link-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 12px; font-family: 'Figtree', sans-serif; color: #6b4de6; background: white; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s; }
+    .preview-link-btn:hover:not(:disabled) { background: #f5f3ff; border-color: #c4b5fd; }
+    .preview-link-btn:disabled { color: #d1d5db; border-color: #e5e7eb; background: #f9fafb; cursor: not-allowed; }
 
     /* Global URL popover */
     #global-popover { position: fixed; z-index: 200; background: white; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 12px 14px; width: 300px; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; display: none; }
-    #global-popover.visible { opacity: 1; pointer-events: none; display: block; }
+    #global-popover.visible { opacity: 1; pointer-events: auto; display: block; }
     #global-popover .pop-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-    #global-popover .pop-url { font-size: 12px; color: #374151; word-break: break-all; line-height: 1.5; }
+    #global-popover .pop-url-row { display: flex; align-items: flex-start; gap: 8px; }
+    #global-popover .pop-url { font-size: 11.5px; color: #374151; word-break: break-all; line-height: 1.5; flex: 1; }
+    #global-popover .pop-copy-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; cursor: pointer; color: #9ca3af; transition: background 0.15s, color 0.15s, border-color 0.15s; margin-top: 1px; }
+    #global-popover .pop-copy-btn:hover { background: #f5f3ff; color: #6b4de6; border-color: #c4b5fd; }
+    #global-popover .pop-copy-btn.copied { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -521,7 +526,12 @@
 <!-- Global URL popover (fixed position, renders above drawer) -->
 <div id="global-popover">
   <p class="pop-label">Unique Review Link</p>
-  <p id="pop-url" class="pop-url"></p>
+  <div class="pop-url-row">
+    <p id="pop-url" class="pop-url"></p>
+    <button id="pop-copy-btn" class="pop-copy-btn" onclick="copyPopoverUrl()" title="Copy link">
+      <svg id="pop-copy-icon" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+    </button>
+  </div>
 </div>
 
 <script>
@@ -780,15 +790,17 @@
   });
 
   // ── Email rows ────────────────────────────────────────────────────
+  var LINK_ICON = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>';
+
   function addEmailRow() {
     clearEmailError();
     var list = document.getElementById('email-list');
     var row = document.createElement('div');
     row.className = 'email-row';
     row.innerHTML =
-      '<input type="email" placeholder="Enter email address..." oninput="clearEmailError()">' +
-      '<button class="preview-link-btn" onmouseenter="showPopover(this)" onmouseleave="hidePopover()">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>' +
+      '<input type="email" placeholder="Enter email address..." oninput="onEmailInput(this)">' +
+      '<button class="preview-link-btn" disabled onmouseenter="showPopover(this)" onmouseleave="hidePopover()">' +
+        LINK_ICON +
         'Preview link' +
       '</button>' +
       '<button onclick="removeEmailRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;">' +
@@ -798,14 +810,33 @@
     row.querySelector('input').focus();
   }
 
-  function removeEmailRow(btn) { btn.closest('.email-row').remove(); }
+  function onEmailInput(input) {
+    clearEmailError();
+    var previewBtn = input.closest('.email-row').querySelector('.preview-link-btn');
+    previewBtn.disabled = !input.validity.valid;
+    // If popover is open for this button, close it when email becomes invalid
+    if (previewBtn.disabled) hidePopover();
+  }
+
+  function removeEmailRow(btn) {
+    hidePopover();
+    btn.closest('.email-row').remove();
+  }
 
   // ── Preview link popover ──────────────────────────────────────────
   function showPopover(btn) {
+    if (btn.disabled) return;
     var row = btn.closest('.email-row');
-    var email = row.querySelector('input').value.trim() || 'team@yourcompany.com';
-    var url = 'https://g2.com/products/acme/reviews/start?src=' + encodeURIComponent(email);
+    var email = row.querySelector('input').value.trim();
+    var name = email.split('@')[0];
+    var url = 'https://www.g2.com/products/g2-seller-solutions/take_survey?utm_source=' + encodeURIComponent(name);
     document.getElementById('pop-url').textContent = url;
+
+    // Reset copy button state
+    var copyBtn = document.getElementById('pop-copy-btn');
+    copyBtn.classList.remove('copied');
+    copyBtn.title = 'Copy link';
+    copyBtn.innerHTML = '<svg id="pop-copy-icon" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
 
     var pop = document.getElementById('global-popover');
     // Show offscreen first to measure height
@@ -825,7 +856,6 @@
     pop.style.left = left + 'px';
     pop.style.top  = top + 'px';
     pop.classList.add('visible');
-    // Trigger opacity transition
     requestAnimationFrame(function() { pop.style.opacity = '1'; });
   }
 
@@ -834,6 +864,21 @@
     pop.classList.remove('visible');
     pop.style.display = 'none';
     pop.style.opacity = '0';
+  }
+
+  function copyPopoverUrl() {
+    var url = document.getElementById('pop-url').textContent;
+    navigator.clipboard.writeText(url).then(function() {
+      var btn = document.getElementById('pop-copy-btn');
+      btn.classList.add('copied');
+      btn.title = 'Copied!';
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+      setTimeout(function() {
+        btn.classList.remove('copied');
+        btn.title = 'Copy link';
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+      }, 2000);
+    });
   }
 </script>
 </body>
