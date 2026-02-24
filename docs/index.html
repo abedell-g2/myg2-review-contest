@@ -982,6 +982,8 @@
       return { email: email, started: started, approved: approved };
     });
 
+    memberData.sort(function(a, b) { return b.approved - a.approved; });
+
     var memberRowsHtml = memberData.map(function(m) {
       return buildMemberRow(m.email, m.started, m.approved, totalApproved);
     }).join('');
