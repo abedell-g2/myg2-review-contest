@@ -94,15 +94,17 @@
     .preview-link-btn:hover:not(:disabled) { background: #f5f3ff; border-color: #c4b5fd; }
     .preview-link-btn:disabled { color: #d1d5db; border-color: #e5e7eb; background: #f9fafb; cursor: not-allowed; }
 
-    /* Global URL popover */
-    #global-popover { position: fixed; z-index: 200; background: white; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 12px 14px; width: 300px; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; display: none; }
-    #global-popover.visible { opacity: 1; pointer-events: auto; display: block; }
+    /* Global URL popover — always display:block since position:fixed has no layout impact */
+    #global-popover { position: fixed; z-index: 9999; background: white; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); padding: 12px 14px; width: 300px; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; top: -9999px; left: -9999px; }
+    #global-popover.pop-visible { opacity: 1; pointer-events: auto; }
     #global-popover .pop-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
     #global-popover .pop-url-row { display: flex; align-items: flex-start; gap: 8px; }
     #global-popover .pop-url { font-size: 11.5px; color: #374151; word-break: break-all; line-height: 1.5; flex: 1; }
     #global-popover .pop-copy-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; cursor: pointer; color: #9ca3af; transition: background 0.15s, color 0.15s, border-color 0.15s; margin-top: 1px; }
     #global-popover .pop-copy-btn:hover { background: #f5f3ff; color: #6b4de6; border-color: #c4b5fd; }
     #global-popover .pop-copy-btn.copied { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
+    /* Preview link wrapper — hover target wraps both button and popover trigger */
+    .preview-link-wrap { position: relative; flex-shrink: 0; }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -524,12 +526,12 @@
 </div>
 
 <!-- Global URL popover (fixed position, renders above drawer) -->
-<div id="global-popover">
+<div id="global-popover" onmouseenter="keepPopover()" onmouseleave="scheduleHidePopover()">
   <p class="pop-label">Unique Review Link</p>
   <div class="pop-url-row">
     <p id="pop-url" class="pop-url"></p>
     <button id="pop-copy-btn" class="pop-copy-btn" onclick="copyPopoverUrl()" title="Copy link">
-      <svg id="pop-copy-icon" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
     </button>
   </div>
 </div>
@@ -797,12 +799,15 @@
     var list = document.getElementById('email-list');
     var row = document.createElement('div');
     row.className = 'email-row';
+    // Hover listeners go on the <span> wrapper, NOT the <button>, so disabled state doesn't block events
     row.innerHTML =
       '<input type="email" placeholder="Enter email address..." oninput="onEmailInput(this)">' +
-      '<button class="preview-link-btn" disabled onmouseenter="showPopover(this)" onmouseleave="hidePopover()">' +
-        LINK_ICON +
-        'Preview link' +
-      '</button>' +
+      '<span class="preview-link-wrap" onmouseenter="showPopover(this)" onmouseleave="scheduleHidePopover()">' +
+        '<button class="preview-link-btn" disabled>' +
+          LINK_ICON +
+          'Preview link' +
+        '</button>' +
+      '</span>' +
       '<button onclick="removeEmailRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;">' +
         '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>' +
       '</button>';
@@ -814,8 +819,7 @@
     clearEmailError();
     var previewBtn = input.closest('.email-row').querySelector('.preview-link-btn');
     previewBtn.disabled = !input.validity.valid;
-    // If popover is open for this button, close it when email becomes invalid
-    if (previewBtn.disabled) hidePopover();
+    if (previewBtn.disabled) scheduleHidePopover();
   }
 
   function removeEmailRow(btn) {
@@ -824,46 +828,52 @@
   }
 
   // ── Preview link popover ──────────────────────────────────────────
-  function showPopover(btn) {
+  var _popTimer = null;
+
+  function showPopover(wrap) {
+    // wrap is the <span class="preview-link-wrap">
+    var btn = wrap.querySelector('.preview-link-btn');
     if (btn.disabled) return;
-    var row = btn.closest('.email-row');
+    clearTimeout(_popTimer);
+
+    var row = wrap.closest('.email-row');
     var email = row.querySelector('input').value.trim();
     var name = email.split('@')[0];
     var url = 'https://www.g2.com/products/g2-seller-solutions/take_survey?utm_source=' + encodeURIComponent(name);
     document.getElementById('pop-url').textContent = url;
 
-    // Reset copy button state
+    // Reset copy button
     var copyBtn = document.getElementById('pop-copy-btn');
     copyBtn.classList.remove('copied');
     copyBtn.title = 'Copy link';
-    copyBtn.innerHTML = '<svg id="pop-copy-icon" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+    copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
 
+    // Position: popover is always display:block (position:fixed), measure its height directly
     var pop = document.getElementById('global-popover');
-    // Show offscreen first to measure height
-    pop.style.top = '-9999px';
-    pop.style.left = '-9999px';
-    pop.style.display = 'block';
-    pop.style.opacity = '0';
-
-    var rect = btn.getBoundingClientRect();
+    var rect = wrap.getBoundingClientRect();
     var popH = pop.offsetHeight;
     var popW = 300;
-    var top = rect.top - popH - 10;
-    if (top < 8) top = rect.bottom + 10; // flip below if no space above
+    var top = rect.top - popH - 8;
+    if (top < 8) top = rect.bottom + 8;
     var left = rect.left;
     if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
 
-    pop.style.left = left + 'px';
     pop.style.top  = top + 'px';
-    pop.classList.add('visible');
-    requestAnimationFrame(function() { pop.style.opacity = '1'; });
+    pop.style.left = left + 'px';
+    pop.classList.add('pop-visible');
+  }
+
+  function scheduleHidePopover() {
+    _popTimer = setTimeout(hidePopover, 120);
+  }
+
+  function keepPopover() {
+    clearTimeout(_popTimer);
   }
 
   function hidePopover() {
-    var pop = document.getElementById('global-popover');
-    pop.classList.remove('visible');
-    pop.style.display = 'none';
-    pop.style.opacity = '0';
+    clearTimeout(_popTimer);
+    document.getElementById('global-popover').classList.remove('pop-visible');
   }
 
   function copyPopoverUrl() {
