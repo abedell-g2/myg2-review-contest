@@ -1,0 +1,58 @@
+- content_for :title, "Select a Review Strategy – MyG2"
+
+.px-8.py-10
+
+  h1.text-3xl.font-bold.text-gray-900.text-center.mb-10 Select a New Review Strategy
+
+  / Strategy cards grid
+  .grid.gap-6.max-w-4xl.mx-auto style="grid-template-columns: repeat(3, 1fr);"
+    - @strategies.each do |strategy|
+      - selected = strategy[:key] == "quarterly_contest"
+      - card_class = selected ? "border-2 ring-2" : "border hover:border-gray-300 hover:shadow-md"
+      - card_style = selected ? "border-color: #6b4de6; ring-color: #6b4de6; background: white;" : "border-color: #e5e7eb; background: white;"
+
+      .relative.rounded-xl.overflow-hidden.cursor-pointer.transition-all class=card_class style=card_style data-strategy=strategy[:key]
+        - if strategy[:recommended]
+          .absolute.top-3.right-3.px-2.py-0.5.rounded-full.text-xs.font-medium style="background-color: #ede9fe; color: #6b4de6;" Recommended
+
+        - if selected
+          .absolute.top-3.left-3.flex.items-center.justify-center.rounded-full style="width: 24px; height: 24px; background-color: #6b4de6;"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor"
+              path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"
+
+        / Illustration placeholder
+        .flex.items-center.justify-center.rounded-t-xl.overflow-hidden style="height: 160px; background: linear-gradient(135deg, #f0f0ff 0%, #e8e0ff 100%);"
+          - case strategy[:key]
+          - when "landing_page"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color: #6b4de6; opacity: 0.6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          - when "embedded"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color: #6b4de6; opacity: 0.6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+          - when "refresh"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color: #6b4de6; opacity: 0.6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          - when "email"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color: #6b4de6; opacity: 0.6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          - when "quarterly_contest"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color: #6b4de6; opacity: 0.6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          - when "event"
+            svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color: #6b4de6; opacity: 0.6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+
+        / Card text
+        .p-5
+          h3.font-semibold.text-gray-900.mb-1 = strategy[:name]
+          p.text-sm.text-gray-500 = strategy[:description]
+
+  / Footer actions
+  .flex.items-center.justify-between.mt-10.max-w-4xl.mx-auto
+    = link_to campaigns_path, class: "px-6 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50" do
+      | Cancel
+
+    = link_to step1_campaigns_path(strategy: "quarterly_contest"), class: "inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white", style: "background-color: #3d2b8e;" do
+      | Next
+      svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"

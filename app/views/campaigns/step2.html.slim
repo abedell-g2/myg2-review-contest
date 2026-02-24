@@ -1,0 +1,101 @@
+- content_for :title, "New Campaign: Step 2 – MyG2"
+
+.fixed.inset-0 style="background: rgba(0,0,0,0.4); z-index: 40;"
+
+.fixed.inset-0.flex.items-center.justify-center style="z-index: 50;"
+  .bg-white.rounded-2xl.overflow-hidden.w-full style="max-width: 608px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.25);"
+
+    / Modal illustration header (stars rating theme)
+    .relative.overflow-hidden style="height: 180px; background: linear-gradient(135deg, #f0f0ff 0%, #e8e0ff 50%, #ddd0ff 100%);"
+      button.absolute.top-4.right-4.text-gray-500.hover:text-gray-700.rounded-full.bg-white style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"
+        = link_to step1_campaigns_path(strategy: @strategy[:key]), class: "text-gray-600"
+          svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+      .flex.items-center.justify-center.h-full.gap-2
+        - 3.times do
+          svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color: #6b4de6; opacity: 0.7;" viewBox="0 0 20 20" fill="currentColor"
+            path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+
+    / Modal body
+    .px-8.pt-6.pb-8
+      h2.text-xl.font-bold.text-gray-900.mb-1 Create a Review Landing Page
+      p.text-sm.text-gray-500.mb-5 Build a custom landing page that gets your reviewers started off on the right foot. Add compelling messaging and incentives along with other customizations.
+
+      / Progress bar
+      .mb-1
+        .flex.gap-1.5
+          .rounded-full.h-1.5.flex-1 style="background-color: #6b4de6;"
+          .rounded-full.h-1.5.flex-1 style="background-color: #6b4de6;"
+          .rounded-full.h-1.5.flex-1 style="background-color: #e5e7eb;"
+        p.text-xs.text-gray-500.mt-1 Step 2/3
+
+      .mt-6
+        = form_with url: step3_campaigns_path, method: :get do |f|
+          = f.hidden_field :strategy, value: @strategy[:key]
+          = f.hidden_field :landing_page_name, value: @landing_page_name
+
+          / Incentive type section
+          label.block.text-sm.font-medium.text-gray-700.mb-3
+            | What type of incentive would you like?
+            span.text-gray-400.text-xs.ml-1 ⓘ
+            span.text-red-500.ml-0.5 *
+
+          / Incentivized accordion (expanded)
+          .rounded-lg.mb-2 style="border: 1px solid #6b4de6;"
+            .flex.items-center.justify-between.px-4.py-3.cursor-pointer
+              .flex.items-center.gap-2
+                / Radio button (selected)
+                .flex.items-center.justify-center.rounded-full style="width: 18px; height: 18px; border: 2px solid #6b4de6;"
+                  .rounded-full style="width: 8px; height: 8px; background-color: #6b4de6;"
+                span.text-sm.font-medium.text-gray-800 Incentivized
+              svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"
+
+            / Expanded content
+            .px-4.pb-4 style="border-top: 1px solid #e5e7eb;"
+              .mt-3
+                p.text-sm.text-gray-600.mb-2 Would you like to cap the number of reviews you collect for this campaign?
+                .flex.gap-4.mb-4
+                  label.flex.items-center.gap-1.5.text-sm.cursor-pointer
+                    input type="radio" name="cap_reviews" value="no" class="text-purple-600"
+                    | No
+                  label.flex.items-center.gap-1.5.text-sm.cursor-pointer
+                    input type="radio" name="cap_reviews" value="yes" checked="checked" class="text-purple-600"
+                    | Yes
+
+                .grid.gap-3 style="grid-template-columns: 1fr 1fr 1fr;"
+                  div
+                    label.block.text-xs.font-medium.text-gray-600.mb-1 Target Number of Reviews
+                    .flex.items-center.border.border-gray-300.rounded-md.overflow-hidden
+                      input type="number" value="50" class="flex-1 px-3 py-1.5 text-sm focus:outline-none" name="review_target"
+                      .flex.flex-col.border-l.border-gray-300
+                        button.px-2.py-0.5.hover:bg-gray-50.text-gray-500 style="font-size: 10px;" ▲
+                        button.px-2.py-0.5.hover:bg-gray-50.text-gray-500 style="font-size: 10px;" ▼
+                  div
+                    label.block.text-xs.font-medium.text-gray-600.mb-1 Select Gift Card Type
+                    select.w-full.border.border-gray-300.rounded-md.px-3.py-1.5.text-sm.focus:outline-none name="gift_card_type"
+                      option Visa Global
+                      option Amazon
+                      option Starbucks
+                  div
+                    label.block.text-xs.font-medium.text-gray-600.mb-1 Select Gift Card Amount
+                    select.w-full.border.border-gray-300.rounded-md.px-3.py-1.5.text-sm.focus:outline-none name="gift_card_amount"
+                      option $10.00
+                      option $25.00
+                      option $50.00
+
+          / No Incentive accordion (collapsed)
+          .rounded-lg.mb-4 style="border: 1px solid #e5e7eb;"
+            .flex.items-center.justify-between.px-4.py-3.cursor-pointer
+              .flex.items-center.gap-2
+                .rounded-full style="width: 18px; height: 18px; border: 2px solid #d1d5db;"
+                span.text-sm.text-gray-600 No Incentive
+              svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+
+          / Footer
+          .flex.items-center.justify-between.mt-4
+            = link_to "Cancel", select_strategy_campaigns_path, class: "px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            .flex.gap-2
+              = link_to "Back", step1_campaigns_path(strategy: @strategy[:key]), class: "px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              = f.submit "Save & Continue →", class: "px-6 py-2.5 rounded-full text-sm font-semibold text-white cursor-pointer", style: "background-color: #3d2b8e;"
