@@ -86,10 +86,18 @@
     .d-card:hover { border-color: #c4b5fd; }
     .d-card.selected { border: 2px solid #6b4de6; box-shadow: 0 0 0 3px rgba(107,77,230,0.08); }
 
-    /* UTM rows */
-    .utm-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .utm-row input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-family: 'Figtree', sans-serif; outline: none; transition: border-color 0.15s; }
-    .utm-row input:focus { border-color: #6b4de6; }
+    /* Email rows */
+    .email-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .email-row input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-family: 'Figtree', sans-serif; outline: none; transition: border-color 0.15s; }
+    .email-row input:focus { border-color: #6b4de6; }
+    .preview-link-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 12px; font-family: 'Figtree', sans-serif; color: #6b4de6; background: white; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
+    .preview-link-btn:hover { background: #f5f3ff; border-color: #c4b5fd; }
+
+    /* Global URL popover */
+    #global-popover { position: fixed; z-index: 200; background: white; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 12px 14px; width: 300px; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; display: none; }
+    #global-popover.visible { opacity: 1; pointer-events: none; display: block; }
+    #global-popover .pop-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    #global-popover .pop-url { font-size: 12px; color: #374151; word-break: break-all; line-height: 1.5; }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -262,32 +270,21 @@
 
     <!-- View: Step 3 -->
     <div id="dview-step3" class="dview px-5 py-5">
-      <p class="text-sm text-gray-500 mb-4">Create a list of keywords to measure the success of each strategy or individual.</p>
-      <label class="block text-sm font-medium text-gray-700 mb-0.5">
-        Add Your UTM Parameters <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span>
+      <p class="text-sm text-gray-500 mb-5">Add team members who will be responsible for generating reviews. Each person gets a unique shareable link.</p>
+      <label class="block text-sm font-medium text-gray-700 mb-3">
+        Team Members <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span>
       </label>
-      <p class="text-xs text-gray-500 mb-3">Incoming reviews will be tagged with these values so you can accurately attribute the source.</p>
-      <p class="text-sm font-medium text-gray-700 mb-3">2 UTM Links Successfully Created</p>
-      <div id="utm-list">
-        <div class="utm-row">
-          <input type="text" value="ryan" placeholder="Enter UTM parameter/keyword...">
-          <button class="flex items-center gap-1 px-2.5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex-shrink-0 text-blue-500" style="font-size:12px;">Preview <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></button>
-          <button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>
-        </div>
-        <div class="utm-row">
-          <input type="text" value="david" placeholder="Enter UTM parameter/keyword...">
-          <button class="flex items-center gap-1 px-2.5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex-shrink-0 text-blue-500" style="font-size:12px;">Preview <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></button>
-          <button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>
-        </div>
-        <div class="utm-row">
-          <input type="text" placeholder="Enter UTM parameter/keyword...">
-          <button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>
-        </div>
+      <div id="email-list"></div>
+      <div class="flex items-center gap-5 mt-1">
+        <button onclick="addEmailRow()" class="flex items-center gap-1.5 text-sm font-medium" style="color:#6b4de6;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add team member
+        </button>
+        <button class="flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-gray-600" style="transition:color 0.15s;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          Upload a list of emails
+        </button>
       </div>
-      <button onclick="addRow()" class="flex items-center gap-1.5 text-sm font-medium mt-1" style="color:#6b4de6;">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Add Parameter
-      </button>
     </div>
 
   </div><!-- end d-scroll -->
@@ -521,6 +518,12 @@
   </div>
 </div>
 
+<!-- Global URL popover (fixed position, renders above drawer) -->
+<div id="global-popover">
+  <p class="pop-label">Unique Review Link</p>
+  <p id="pop-url" class="pop-url"></p>
+</div>
+
 <script>
   var dCurrent = 'strategy';
   var TRANS = '0.3s cubic-bezier(0.4,0,0.2,1)';
@@ -620,7 +623,7 @@
       // Disabled unless a card is already selected
       document.getElementById('d-btn-next').disabled = !document.querySelector('.d-card.selected');
     } else {
-      var titles = { step1:'Campaign Setup', step2:'Review Incentive', step3:'UTM Parameters' };
+      var titles = { step1:'Campaign Setup', step2:'Review Incentive', step3:'Team Members' };
       document.getElementById('d-title').textContent = titles[dCurrent];
       labelEl.textContent = 'Step ' + stepNum + ' of 3';
       labelEl.classList.add('d-vis');
@@ -645,14 +648,14 @@
       clearError(inp, 'page-name-error');
     }
     if (dCurrent === 'step3') {
-      var filled = Array.from(document.querySelectorAll('#utm-list .utm-row input'))
+      var filled = Array.from(document.querySelectorAll('#email-list .email-row input'))
                        .some(function(i) { return i.value.trim(); });
       if (!filled) {
-        setUtmError('Please add at least one UTM parameter.');
+        setEmailError('Please add at least one team member email.');
         shakeBtn();
         return false;
       }
-      clearUtmError();
+      clearEmailError();
     }
     return true;
   }
@@ -675,27 +678,27 @@
     if (el) el.remove();
   }
 
-  function setUtmError(msg) {
-    var el = document.getElementById('utm-error');
+  function setEmailError(msg) {
+    var el = document.getElementById('email-error');
     if (!el) {
       el = document.createElement('p');
-      el.id = 'utm-error';
+      el.id = 'email-error';
       el.style.cssText = 'color:#ef4444;font-size:12px;margin-bottom:8px;';
-      var list = document.getElementById('utm-list');
+      var list = document.getElementById('email-list');
       list.parentNode.insertBefore(el, list);
     }
     el.textContent = msg;
   }
 
-  function clearUtmError() {
-    var el = document.getElementById('utm-error');
+  function clearEmailError() {
+    var el = document.getElementById('email-error');
     if (el) el.remove();
   }
 
   function clearAllErrors() {
     var pn = document.getElementById('page-name');
     if (pn) clearError(pn, 'page-name-error');
-    clearUtmError();
+    clearEmailError();
   }
 
   function shakeBtn() {
@@ -776,17 +779,62 @@
     if (this.value.trim()) clearError(this, 'page-name-error');
   });
 
-  function addRow() {
-    clearUtmError();
-    var list = document.getElementById('utm-list');
+  // ── Email rows ────────────────────────────────────────────────────
+  function addEmailRow() {
+    clearEmailError();
+    var list = document.getElementById('email-list');
     var row = document.createElement('div');
-    row.className = 'utm-row';
-    row.innerHTML = '<input type="text" placeholder="Enter UTM parameter/keyword..."><button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>';
+    row.className = 'email-row';
+    row.innerHTML =
+      '<input type="email" placeholder="Enter email address..." oninput="clearEmailError()">' +
+      '<button class="preview-link-btn" onmouseenter="showPopover(this)" onmouseleave="hidePopover()">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>' +
+        'Preview link' +
+      '</button>' +
+      '<button onclick="removeEmailRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>' +
+      '</button>';
     list.appendChild(row);
     row.querySelector('input').focus();
   }
 
-  function removeRow(btn) { btn.closest('.utm-row').remove(); }
+  function removeEmailRow(btn) { btn.closest('.email-row').remove(); }
+
+  // ── Preview link popover ──────────────────────────────────────────
+  function showPopover(btn) {
+    var row = btn.closest('.email-row');
+    var email = row.querySelector('input').value.trim() || 'team@yourcompany.com';
+    var url = 'https://g2.com/products/acme/reviews/start?src=' + encodeURIComponent(email);
+    document.getElementById('pop-url').textContent = url;
+
+    var pop = document.getElementById('global-popover');
+    // Show offscreen first to measure height
+    pop.style.top = '-9999px';
+    pop.style.left = '-9999px';
+    pop.style.display = 'block';
+    pop.style.opacity = '0';
+
+    var rect = btn.getBoundingClientRect();
+    var popH = pop.offsetHeight;
+    var popW = 300;
+    var top = rect.top - popH - 10;
+    if (top < 8) top = rect.bottom + 10; // flip below if no space above
+    var left = rect.left;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+
+    pop.style.left = left + 'px';
+    pop.style.top  = top + 'px';
+    pop.classList.add('visible');
+    // Trigger opacity transition
+    requestAnimationFrame(function() { pop.style.opacity = '1'; });
+  }
+
+  function hidePopover() {
+    var pop = document.getElementById('global-popover');
+    pop.classList.remove('visible');
+    pop.style.display = 'none';
+    pop.style.opacity = '0';
+  }
 </script>
 </body>
 </html>
