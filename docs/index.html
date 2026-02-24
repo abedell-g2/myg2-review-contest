@@ -111,6 +111,9 @@
     .member-email-input:hover { background: #f3f4f6; }
     .member-email-input:focus { background: #f5f3ff; box-shadow: 0 0 0 2px rgba(107,77,230,0.18); color: #3d2b8e; }
     .member-email-input::placeholder { color: #d1d5db; }
+    /* Link icon button in accordion member rows */
+    .member-link-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; cursor: pointer; color: #6b4de6; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
+    .member-link-btn:hover { background: #f5f3ff; border-color: #c4b5fd; }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -1009,15 +1012,22 @@
     var detailRow =
       '<tr class="campaign-detail-row" style="display:none;">' +
         '<td colspan="9" style="padding:0;background:#fafafa;border-bottom:1px solid #e5e7eb;">' +
-          '<div style="padding:14px 20px 20px 52px;">' +
+          '<div style="padding:14px 24px 20px 52px;">' +
             '<p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9ca3af;margin-bottom:12px;">Campaign Performance</p>' +
-            '<table style="border-collapse:collapse;width:100%;max-width:640px;">' +
+            '<table style="border-collapse:collapse;width:100%;table-layout:fixed;">' +
+              '<colgroup>' +
+                '<col style="width:28%">' +
+                '<col style="width:14%">' +
+                '<col style="width:14%">' +
+                '<col style="width:auto">' +
+                '<col style="width:36px">' +
+              '</colgroup>' +
               '<thead><tr>' +
-                '<th ' + TH + ' style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:8px;white-space:nowrap;min-width:180px;padding-right:20px;">Team Member</th>' +
+                '<th ' + TH + ' style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:8px;white-space:nowrap;padding-right:20px;">Team Member</th>' +
                 '<th ' + TH + ' style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:8px;white-space:nowrap;padding-right:20px;">Reviews Started</th>' +
                 '<th ' + TH + ' style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:8px;white-space:nowrap;padding-right:20px;">Approved Reviews</th>' +
-                '<th ' + TH + ' style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:8px;white-space:nowrap;min-width:160px;padding-right:16px;">Contribution</th>' +
-                '<th ' + TH + '></th>' +
+                '<th ' + TH + ' style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:8px;white-space:nowrap;">Contribution</th>' +
+                '<th></th>' +
               '</tr></thead>' +
               '<tbody id="' + perfId + '">' + memberRowsHtml + '</tbody>' +
             '</table>' +
@@ -1036,17 +1046,17 @@
 
   function buildMemberRow(email, started, approved, totalApproved) {
     var pct = totalApproved > 0 ? Math.round((approved / totalApproved) * 100) : 0;
-    var removeBtn =
-      '<button onclick="removeMemberRow(this)" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid #e5e7eb;border-radius:5px;background:white;cursor:pointer;color:#d1d5db;transition:background 0.15s,color 0.15s,border-color 0.15s;" onmouseenter="this.style.background=\'#fef2f2\';this.style.color=\'#ef4444\';this.style.borderColor=\'#fca5a5\';" onmouseleave="this.style.background=\'white\';this.style.color=\'#d1d5db\';this.style.borderColor=\'#e5e7eb\';">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>' +
+    var linkBtn =
+      '<button class="member-link-btn" onmouseenter="showMemberPopover(this)" onmouseleave="scheduleHidePopover()">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>' +
       '</button>';
     return '<tr style="border-bottom:1px solid #f3f4f6;">' +
-      '<td style="padding:6px 20px 6px 0;min-width:180px;">' +
+      '<td style="padding:6px 20px 6px 0;">' +
         '<input type="email" class="member-email-input" value="' + email + '" placeholder="name@company.com">' +
       '</td>' +
       '<td style="padding:6px 20px 6px 0;font-size:13px;color:#374151;font-weight:500;">' + started + '</td>' +
       '<td style="padding:6px 20px 6px 0;font-size:13px;font-weight:500;color:#6b4de6;">' + approved + '</td>' +
-      '<td style="padding:6px 16px 6px 0;min-width:160px;">' +
+      '<td style="padding:6px 16px 6px 0;">' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
           '<div style="flex:1;height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;">' +
             '<div style="height:100%;background:#6b4de6;border-radius:99px;width:' + pct + '%;"></div>' +
@@ -1054,8 +1064,17 @@
           '<span style="font-size:11px;color:#9ca3af;width:30px;text-align:right;">' + pct + '%</span>' +
         '</div>' +
       '</td>' +
-      '<td style="padding:6px 0;">' + removeBtn + '</td>' +
+      '<td style="padding:6px 0;text-align:right;">' + linkBtn + '</td>' +
     '</tr>';
+  }
+
+  function showMemberPopover(btn) {
+    var email = btn.closest('tr').querySelector('.member-email-input').value.trim();
+    if (!email || email.indexOf('@') < 1) return;
+    clearTimeout(_popTimer);
+    var name = email.split('@')[0];
+    var url = 'https://www.g2.com/products/g2-seller-solutions/take_survey?utm_source=' + encodeURIComponent(name);
+    _showPopover(btn, url);
   }
 
   function addMemberRow(perfId) {
