@@ -55,9 +55,24 @@
       opacity: 0;
       pointer-events: none;
       transform: translateX(0);
-      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1), transform 0.32s cubic-bezier(0.4,0,0.2,1);
+      /* No CSS transition here — applied inline during animation only */
     }
     .dview.is-active { opacity: 1; pointer-events: auto; }
+
+    /* Progress bar + step label: always in layout so height never shifts */
+    #d-step-label { visibility: hidden; opacity: 0; transition: opacity 0.2s ease; }
+    #d-step-label.d-vis { visibility: visible; opacity: 1; }
+    #d-progress { visibility: hidden; opacity: 0; transition: opacity 0.2s ease; }
+    #d-progress.d-vis { visibility: visible; opacity: 1; }
+
+    /* Shake on validation fail */
+    @keyframes d-shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-5px); }
+      50%     { transform: translateX(5px); }
+      75%     { transform: translateX(-3px); }
+    }
+    .d-shake { animation: d-shake 0.3s ease; }
 
     /* Strategy cards */
     .d-card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; background: white; }
@@ -81,7 +96,7 @@
   <!-- Header -->
   <div class="flex items-center justify-between px-5 flex-shrink-0" style="height:60px; border-bottom:1px solid #e5e7eb;">
     <div>
-      <p id="d-step-label" class="d-hidden text-xs font-semibold mb-0.5" style="color:#6b4de6;"></p>
+      <p id="d-step-label" class="text-xs font-semibold mb-0.5" style="color:#6b4de6;"></p>
       <h2 id="d-title" class="font-semibold text-gray-900" style="font-size:15px;">Select a Strategy</h2>
     </div>
     <button onclick="closeDrawer()" class="flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500" style="width:32px;height:32px;flex-shrink:0;">
@@ -90,7 +105,7 @@
   </div>
 
   <!-- Progress bar (hidden on strategy view) -->
-  <div id="d-progress" class="d-hidden flex gap-1.5 px-5 py-2.5 flex-shrink-0" style="border-bottom:1px solid #f3f4f6;">
+  <div id="d-progress" class="flex gap-1.5 px-5 py-2.5 flex-shrink-0" style="border-bottom:1px solid #f3f4f6;">
     <div id="dpb-1" class="rounded-full flex-1" style="height:4px;background:#e5e7eb;transition:background 0.25s;"></div>
     <div id="dpb-2" class="rounded-full flex-1" style="height:4px;background:#e5e7eb;transition:background 0.25s;"></div>
     <div id="dpb-3" class="rounded-full flex-1" style="height:4px;background:#e5e7eb;transition:background 0.25s;"></div>
@@ -486,8 +501,10 @@
 </div>
 
 <script>
-  let dCurrent = 'strategy';
+  var dCurrent = 'strategy';
+  var TRANS = '0.3s cubic-bezier(0.4,0,0.2,1)';
 
+  // ── Open / close ────────────────────────────────────────────────
   function openDrawer() {
     document.getElementById('drawer-backdrop').classList.add('open');
     document.getElementById('drawer').classList.add('open');
@@ -498,109 +515,93 @@
     document.getElementById('drawer-backdrop').classList.remove('open');
     document.getElementById('drawer').classList.remove('open');
     document.body.style.overflow = '';
-    // Reset to strategy view silently after drawer slides out
+    clearAllErrors();
+    // After drawer has slid out, silently reset to strategy view
     setTimeout(function() {
-      if (dCurrent !== 'strategy') {
-        document.querySelectorAll('.dview').forEach(function(el) {
-          el.style.transition = 'none';
-          el.classList.remove('is-active');
-          el.style.transform = '';
-        });
-        document.getElementById('dview-strategy').classList.add('is-active');
-        dCurrent = 'strategy';
-        updateDrawerUI();
-        // Re-enable transitions after a frame
-        requestAnimationFrame(function() {
-          document.querySelectorAll('.dview').forEach(function(el) {
-            el.style.transition = '';
-          });
-        });
-      }
-    }, 350);
+      document.querySelectorAll('.dview').forEach(function(el) {
+        el.classList.remove('is-active');
+        el.style.cssText = '';
+      });
+      document.getElementById('dview-strategy').classList.add('is-active');
+      dCurrent = 'strategy';
+      updateDrawerUI();
+    }, 360);
   }
 
+  // ── Navigation ───────────────────────────────────────────────────
   function dGoTo(next, dir) {
     dir = dir || 'forward';
     var outEl = document.getElementById('dview-' + dCurrent);
     var inEl  = document.getElementById('dview-' + next);
-    var inX   = dir === 'forward' ? '32px' : '-32px';
-    var outX  = dir === 'forward' ? '-32px' : '32px';
+    var inX   = dir === 'forward' ? '28px' : '-28px';
+    var outX  = dir === 'forward' ? '-28px' : '28px';
 
-    // Snap incoming view to its off-screen start position (no transition)
-    inEl.style.transition = 'none';
-    inEl.style.transform  = 'translateX(' + inX + ')';
-    inEl.style.opacity    = '0';
+    // 1. Snap incoming to its off-screen start with transitions disabled
+    inEl.style.cssText = 'transition:none; opacity:0; transform:translateX(' + inX + '); pointer-events:none;';
 
-    // Double RAF: first frame commits the snap, second frame starts the transition
+    // 2. Double-RAF so browser commits the snap before we start animating
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
-        // Restore transitions on both elements
-        inEl.style.transition  = '';
-        outEl.style.transition = '';
+        var t = 'opacity ' + TRANS + ', transform ' + TRANS;
+        // Incoming: slides in and fades up
+        inEl.style.cssText = 'transition:' + t + '; opacity:1; transform:translateX(0); pointer-events:none;';
+        // Outgoing: slides out and fades
+        outEl.style.cssText = 'transition:' + t + '; opacity:0; transform:translateX(' + outX + '); pointer-events:none;';
 
-        // Outgoing: slide and fade out
-        outEl.style.transform = 'translateX(' + outX + ')';
-        outEl.style.opacity   = '0';
-        outEl.classList.remove('is-active');
-
-        // Incoming: slide to 0 and fade in
-        inEl.style.transform = 'translateX(0)';
-        inEl.style.opacity   = '1';
-        inEl.classList.add('is-active');
-
-        // After the transition, clean up inline styles
-        inEl.addEventListener('transitionend', function cleanup(e) {
+        // After animation: hand control back to CSS classes
+        inEl.addEventListener('transitionend', function done(e) {
           if (e.propertyName !== 'opacity') return;
-          outEl.style.transform = '';
-          outEl.style.opacity   = '';
-          inEl.style.transform  = '';
-          inEl.style.opacity    = '';
-          inEl.removeEventListener('transitionend', cleanup);
+          outEl.classList.remove('is-active');
+          inEl.classList.add('is-active');
+          outEl.style.cssText = '';
+          inEl.style.cssText  = '';
+          inEl.removeEventListener('transitionend', done);
         });
       });
     });
 
-    // Reset scroll on the incoming view
     inEl.scrollTop = 0;
     dCurrent = next;
     updateDrawerUI();
   }
 
   function dNext() {
+    if (!validateStep()) return;
     var map = { strategy: 'step1', step1: 'step2', step2: 'step3' };
     if (map[dCurrent]) {
       dGoTo(map[dCurrent]);
     } else {
-      closeDrawer();
+      closeDrawer(); // step3 → finish
     }
   }
 
   function dBack() {
+    clearAllErrors();
     var map = { step1: 'strategy', step2: 'step1', step3: 'step2' };
     if (map[dCurrent]) dGoTo(map[dCurrent], 'back');
   }
 
+  // ── Header / UI sync ────────────────────────────────────────────
   function updateDrawerUI() {
-    var stepNum = { strategy: 0, step1: 1, step2: 2, step3: 3 }[dCurrent];
-    var titleEl   = document.getElementById('d-title');
+    var stepNum   = { strategy:0, step1:1, step2:2, step3:3 }[dCurrent];
     var labelEl   = document.getElementById('d-step-label');
     var progressEl = document.getElementById('d-progress');
     var backBtn   = document.getElementById('d-btn-back');
     var nextLabel = document.getElementById('d-next-label');
 
     if (dCurrent === 'strategy') {
-      titleEl.textContent = 'Select a Strategy';
-      labelEl.classList.add('d-hidden');
-      progressEl.classList.add('d-hidden');
+      document.getElementById('d-title').textContent = 'Select a Strategy';
+      labelEl.classList.remove('d-vis');
+      progressEl.classList.remove('d-vis');
       backBtn.classList.add('d-hidden');
       nextLabel.textContent = 'Next';
     } else {
-      var titles = { step1: 'Campaign Setup', step2: 'Review Incentive', step3: 'UTM Parameters' };
+      var titles = { step1:'Campaign Setup', step2:'Review Incentive', step3:'UTM Parameters' };
+      document.getElementById('d-title').textContent = titles[dCurrent];
       labelEl.textContent = 'Step ' + stepNum + ' of 3';
-      labelEl.classList.remove('d-hidden');
-      titleEl.textContent = titles[dCurrent];
-      progressEl.classList.remove('d-hidden');
-      [1, 2, 3].forEach(function(i) {
+      labelEl.classList.add('d-vis');
+      progressEl.classList.add('d-vis');
+      [1,2,3].forEach(function(i) {
         document.getElementById('dpb-' + i).style.background = i <= stepNum ? '#6b4de6' : '#e5e7eb';
       });
       backBtn.classList.remove('d-hidden');
@@ -608,6 +609,80 @@
     }
   }
 
+  // ── Validation ───────────────────────────────────────────────────
+  function validateStep() {
+    if (dCurrent === 'step1') {
+      var inp = document.getElementById('page-name');
+      if (!inp.value.trim()) {
+        setError(inp, 'page-name-error', 'Please enter a name for your landing page.');
+        shakeBtn();
+        return false;
+      }
+      clearError(inp, 'page-name-error');
+    }
+    if (dCurrent === 'step3') {
+      var filled = Array.from(document.querySelectorAll('#utm-list .utm-row input'))
+                       .some(function(i) { return i.value.trim(); });
+      if (!filled) {
+        setUtmError('Please add at least one UTM parameter.');
+        shakeBtn();
+        return false;
+      }
+      clearUtmError();
+    }
+    return true;
+  }
+
+  function setError(input, errorId, msg) {
+    input.style.borderColor = '#ef4444';
+    var el = document.getElementById(errorId);
+    if (!el) {
+      el = document.createElement('p');
+      el.id = errorId;
+      el.style.cssText = 'color:#ef4444;font-size:12px;margin-top:4px;';
+      input.parentNode.insertBefore(el, input.nextSibling);
+    }
+    el.textContent = msg;
+  }
+
+  function clearError(input, errorId) {
+    input.style.borderColor = '';
+    var el = document.getElementById(errorId);
+    if (el) el.remove();
+  }
+
+  function setUtmError(msg) {
+    var el = document.getElementById('utm-error');
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'utm-error';
+      el.style.cssText = 'color:#ef4444;font-size:12px;margin-bottom:8px;';
+      var list = document.getElementById('utm-list');
+      list.parentNode.insertBefore(el, list);
+    }
+    el.textContent = msg;
+  }
+
+  function clearUtmError() {
+    var el = document.getElementById('utm-error');
+    if (el) el.remove();
+  }
+
+  function clearAllErrors() {
+    var pn = document.getElementById('page-name');
+    if (pn) clearError(pn, 'page-name-error');
+    clearUtmError();
+  }
+
+  function shakeBtn() {
+    var btn = document.getElementById('d-btn-next');
+    btn.classList.remove('d-shake');
+    btn.offsetWidth; // force reflow
+    btn.classList.add('d-shake');
+    btn.addEventListener('animationend', function() { btn.classList.remove('d-shake'); }, { once: true });
+  }
+
+  // ── Strategy card selection ──────────────────────────────────────
   function selectDCard(el) {
     document.querySelectorAll('.d-card').forEach(function(c) {
       c.classList.remove('selected');
@@ -618,22 +693,26 @@
     var illus = el.querySelector('div:first-child');
     illus.style.position = 'relative';
     var badge = document.createElement('div');
-    badge.className = 'd-check-badge absolute top-2 left-2 flex items-center justify-center rounded-full';
-    badge.style.cssText = 'width:20px;height:20px;background:#6b4de6;position:absolute;top:8px;left:8px;display:flex;align-items:center;justify-content:center;border-radius:50%;';
+    badge.className = 'd-check-badge';
+    badge.style.cssText = 'position:absolute;top:8px;left:8px;width:20px;height:20px;background:#6b4de6;border-radius:50%;display:flex;align-items:center;justify-content:center;';
     badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
     illus.appendChild(badge);
   }
 
+  // ── Input helpers ────────────────────────────────────────────────
   document.getElementById('page-name').addEventListener('input', function() {
     document.getElementById('char-count').textContent = this.value.length + ' / 40';
+    if (this.value.trim()) clearError(this, 'page-name-error');
   });
 
   function addRow() {
+    clearUtmError();
     var list = document.getElementById('utm-list');
     var row = document.createElement('div');
     row.className = 'utm-row';
     row.innerHTML = '<input type="text" placeholder="Enter UTM parameter/keyword..."><button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:34px;height:34px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>';
     list.appendChild(row);
+    row.querySelector('input').focus();
   }
 
   function removeRow(btn) { btn.closest('.utm-row').remove(); }
