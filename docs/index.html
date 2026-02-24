@@ -46,12 +46,18 @@
     #drawer.open { transform: translateX(0); }
 
     /* Drawer view transitions */
-    .dview { transition: opacity 0.22s ease, transform 0.22s ease; }
     .d-hidden { display: none !important; }
-    .d-entering     { opacity: 0; transform: translateX(24px); }
-    .d-exiting      { opacity: 0; transform: translateX(-24px); pointer-events: none; }
-    .d-entering-back { opacity: 0; transform: translateX(-24px); }
-    .d-exiting-back  { opacity: 0; transform: translateX(24px); pointer-events: none; }
+    #d-scroll { position: relative; }
+    .dview {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(0);
+      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1), transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+    .dview.is-active { opacity: 1; pointer-events: auto; }
 
     /* Strategy cards */
     .d-card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; background: white; }
@@ -91,10 +97,10 @@
   </div>
 
   <!-- Scrollable body -->
-  <div id="d-scroll" class="flex-1 overflow-y-auto overflow-x-hidden">
+  <div id="d-scroll" class="flex-1 overflow-hidden">
 
     <!-- View: Strategy selection -->
-    <div id="dview-strategy" class="dview px-5 py-5">
+    <div id="dview-strategy" class="dview is-active px-5 py-5">
       <p class="text-sm text-gray-500 mb-4">Choose the type of review campaign you'd like to create.</p>
       <div class="grid gap-3" style="grid-template-columns:1fr 1fr;">
 
@@ -148,7 +154,7 @@
     </div>
 
     <!-- View: Step 1 -->
-    <div id="dview-step1" class="dview d-hidden px-5 py-5">
+    <div id="dview-step1" class="dview px-5 py-5">
       <p class="text-sm text-gray-500 mb-5">Using custom UTM parameters, compare review generation across people or channels.</p>
       <label class="block text-sm font-medium text-gray-700 mb-1.5">
         Landing Page Name <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span>
@@ -164,7 +170,7 @@
     </div>
 
     <!-- View: Step 2 -->
-    <div id="dview-step2" class="dview d-hidden px-5 py-5">
+    <div id="dview-step2" class="dview px-5 py-5">
       <p class="text-sm text-gray-500 mb-4">Build a custom landing page that gets your reviewers started off on the right foot.</p>
       <label class="block text-sm font-medium text-gray-700 mb-3">
         What type of incentive would you like? <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span>
@@ -219,7 +225,7 @@
     </div>
 
     <!-- View: Step 3 -->
-    <div id="dview-step3" class="dview d-hidden px-5 py-5">
+    <div id="dview-step3" class="dview px-5 py-5">
       <p class="text-sm text-gray-500 mb-4">Create a list of keywords to measure the success of each strategy or individual.</p>
       <label class="block text-sm font-medium text-gray-700 mb-0.5">
         Add Your UTM Parameters <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span>
@@ -492,38 +498,70 @@
     document.getElementById('drawer-backdrop').classList.remove('open');
     document.getElementById('drawer').classList.remove('open');
     document.body.style.overflow = '';
-    // Reset to strategy view after animation completes
+    // Reset to strategy view silently after drawer slides out
     setTimeout(function() {
       if (dCurrent !== 'strategy') {
         document.querySelectorAll('.dview').forEach(function(el) {
-          el.classList.remove('d-entering','d-exiting','d-entering-back','d-exiting-back');
-          el.classList.add('d-hidden');
+          el.style.transition = 'none';
+          el.classList.remove('is-active');
+          el.style.transform = '';
         });
-        document.getElementById('dview-strategy').classList.remove('d-hidden');
+        document.getElementById('dview-strategy').classList.add('is-active');
         dCurrent = 'strategy';
         updateDrawerUI();
+        // Re-enable transitions after a frame
+        requestAnimationFrame(function() {
+          document.querySelectorAll('.dview').forEach(function(el) {
+            el.style.transition = '';
+          });
+        });
       }
     }, 350);
   }
 
   function dGoTo(next, dir) {
     dir = dir || 'forward';
-    var out = document.getElementById('dview-' + dCurrent);
-    var inn = document.getElementById('dview-' + next);
+    var outEl = document.getElementById('dview-' + dCurrent);
+    var inEl  = document.getElementById('dview-' + next);
+    var inX   = dir === 'forward' ? '32px' : '-32px';
+    var outX  = dir === 'forward' ? '-32px' : '32px';
 
-    inn.classList.remove('d-hidden');
-    inn.classList.add(dir === 'forward' ? 'd-entering' : 'd-entering-back');
-    inn.getBoundingClientRect(); // force reflow
-    out.classList.add(dir === 'forward' ? 'd-exiting' : 'd-exiting-back');
-    inn.classList.remove('d-entering', 'd-entering-back');
+    // Snap incoming view to its off-screen start position (no transition)
+    inEl.style.transition = 'none';
+    inEl.style.transform  = 'translateX(' + inX + ')';
+    inEl.style.opacity    = '0';
 
-    out.addEventListener('transitionend', function handler() {
-      out.classList.remove('d-exiting', 'd-exiting-back');
-      out.classList.add('d-hidden');
-      out.removeEventListener('transitionend', handler);
+    // Double RAF: first frame commits the snap, second frame starts the transition
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        // Restore transitions on both elements
+        inEl.style.transition  = '';
+        outEl.style.transition = '';
+
+        // Outgoing: slide and fade out
+        outEl.style.transform = 'translateX(' + outX + ')';
+        outEl.style.opacity   = '0';
+        outEl.classList.remove('is-active');
+
+        // Incoming: slide to 0 and fade in
+        inEl.style.transform = 'translateX(0)';
+        inEl.style.opacity   = '1';
+        inEl.classList.add('is-active');
+
+        // After the transition, clean up inline styles
+        inEl.addEventListener('transitionend', function cleanup(e) {
+          if (e.propertyName !== 'opacity') return;
+          outEl.style.transform = '';
+          outEl.style.opacity   = '';
+          inEl.style.transform  = '';
+          inEl.style.opacity    = '';
+          inEl.removeEventListener('transitionend', cleanup);
+        });
+      });
     });
 
-    document.getElementById('d-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    // Reset scroll on the incoming view
+    inEl.scrollTop = 0;
     dCurrent = next;
     updateDrawerUI();
   }
