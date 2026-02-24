@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: myg2-review-contest
+    runtime: ruby
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec rails server -b 0.0.0.0"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: myg2-review-contest-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: WEB_CONCURRENCY
+        value: 2
+
+databases:
+  - name: myg2-review-contest-db
+    databaseName: myg2_review_contest
+    user: myg2_review_contest
