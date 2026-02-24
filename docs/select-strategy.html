@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Select a Review Strategy – MyG2</title>
+  <title>New Review Campaign – MyG2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,12 +17,26 @@
     .strategy-card { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.15s; background: white; }
     .strategy-card:hover { border-color: #c4b5fd; box-shadow: 0 4px 12px rgba(107,77,230,0.12); }
     .strategy-card.selected { border: 2px solid #6b4de6; box-shadow: 0 0 0 3px rgba(107,77,230,0.1); }
+
+    /* View transitions */
+    .view { transition: opacity 0.28s ease, transform 0.28s ease; }
+    .view.hidden { display: none; }
+    .view.entering  { opacity: 0; transform: translateX(36px); }
+    .view.exiting   { opacity: 0; transform: translateX(-36px); pointer-events: none; }
+    .view.entering-back { opacity: 0; transform: translateX(-36px); }
+    .view.exiting-back  { opacity: 0; transform: translateX(36px);  pointer-events: none; }
+
+    /* Step card */
+    .step-illustration { display: flex; align-items: center; justify-content: center; height: 180px; background: linear-gradient(135deg, #eeeaff 0%, #e0d6ff 55%, #d4c6ff 100%); border-radius: 16px 16px 0 0; }
+    .utm-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .utm-row input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: 'Figtree', sans-serif; outline: none; transition: border-color 0.15s; }
+    .utm-row input:focus { border-color: #6b4de6; }
   </style>
 </head>
 <body class="bg-gray-100">
 <div class="flex h-screen overflow-hidden">
 
-  <!-- Sidebar (same as index) -->
+  <!-- ─── Sidebar ─── -->
   <nav class="flex flex-col justify-between flex-shrink-0" style="background-color:#1b2744; width:241px;">
     <div class="overflow-y-auto">
       <div class="flex items-center justify-between px-4 py-3" style="border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -36,7 +50,7 @@
       <div class="px-3 py-2">
         <button class="flex items-center gap-2 w-full px-2 py-2 rounded text-white text-sm" style="background:rgba(255,255,255,0.08);">
           <div class="rounded flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:#4b5563;width:28px;height:28px;">AI</div>
-          <span class="flex-1 text-left text-sm">Acme Inc.</span>
+          <span class="flex-1 text-left">Acme Inc.</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
       </div>
@@ -76,7 +90,7 @@
     </div>
   </nav>
 
-  <!-- Main -->
+  <!-- ─── Main ─── -->
   <div class="flex flex-col flex-1 overflow-hidden">
     <header class="flex items-center justify-between px-6 bg-white flex-shrink-0" style="border-bottom:1px solid #e5e7eb; height:60px;">
       <div class="flex items-center gap-3">
@@ -96,123 +110,301 @@
       </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto bg-gray-50 px-8 py-10">
-      <h1 class="text-3xl font-bold text-gray-900 text-center mb-10">Select a New Review Strategy</h1>
+    <main id="main-scroll" class="flex-1 overflow-y-auto bg-gray-50">
 
-      <!-- Strategy grid -->
-      <div id="strategy-grid" class="grid gap-5 mx-auto" style="max-width:900px; grid-template-columns: repeat(3, 1fr);">
+      <!-- ══ VIEW: Strategy grid ══ -->
+      <div id="view-strategy" class="view px-8 py-10">
+        <h1 class="text-3xl font-bold text-gray-900 text-center mb-10">Select a New Review Strategy</h1>
+        <div class="grid gap-5 mx-auto" style="max-width:900px; grid-template-columns: repeat(3, 1fr);">
 
-        <!-- Card 1: Review Landing Page (Recommended) -->
-        <div class="strategy-card" data-strategy="landing_page" onclick="selectCard(this)">
-          <div class="relative flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-medium" style="background:#ede9fe;color:#6b4de6;">Recommended</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.55;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          </div>
-          <div class="p-5">
-            <h3 class="font-semibold text-gray-900 mb-1">Review Landing Page</h3>
-            <p class="text-sm text-gray-500">Create a dedicated landing page to capture customer reviews.</p>
-          </div>
-        </div>
-
-        <!-- Card 2: Embedded Reviews -->
-        <div class="strategy-card" data-strategy="embedded" onclick="selectCard(this)">
-          <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.55;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-          </div>
-          <div class="p-5">
-            <h3 class="font-semibold text-gray-900 mb-1">Embedded Reviews</h3>
-            <p class="text-sm text-gray-500">Add our customizable review workflow within your software or website.</p>
-          </div>
-        </div>
-
-        <!-- Card 3: Review Refresh Campaign -->
-        <div class="strategy-card" data-strategy="refresh" onclick="selectCard(this)">
-          <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.55;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </div>
-          <div class="p-5">
-            <h3 class="font-semibold text-gray-900 mb-1">Review Refresh Campaign</h3>
-            <p class="text-sm text-gray-500">Prompt previous reviewers to update their experience</p>
-          </div>
-        </div>
-
-        <!-- Card 4: Email Campaign -->
-        <div class="strategy-card" data-strategy="email" onclick="selectCard(this)">
-          <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.55;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </div>
-          <div class="p-5">
-            <h3 class="font-semibold text-gray-900 mb-1">Email Campaign</h3>
-            <p class="text-sm text-gray-500">Reach out to customers with a targeted email campaign</p>
-          </div>
-        </div>
-
-        <!-- Card 5: Quarterly Review Contest (default selected) -->
-        <div class="strategy-card selected" id="card-quarterly_contest" data-strategy="quarterly_contest" onclick="selectCard(this)">
-          <div class="relative flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <div class="absolute top-3 left-3 flex items-center justify-center rounded-full" style="width:24px;height:24px;background:#6b4de6;">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <div class="strategy-card" data-strategy="landing_page" onclick="selectCard(this)">
+            <div class="relative flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-medium" style="background:#ede9fe;color:#6b4de6;">Recommended</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.55;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <div class="p-5"><h3 class="font-semibold text-gray-900 mb-1">Review Landing Page</h3><p class="text-sm text-gray-500">Create a dedicated landing page to capture customer reviews.</p></div>
           </div>
-          <div class="p-5">
-            <h3 class="font-semibold text-gray-900 mb-1">Quarterly Review Contest</h3>
-            <p class="text-sm text-gray-500">Using custom UTM parameters, compare review generation across people or channels</p>
-          </div>
-        </div>
 
-        <!-- Card 6: Event Reviews -->
-        <div class="strategy-card" data-strategy="event" onclick="selectCard(this)">
-          <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.55;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <div class="strategy-card" data-strategy="embedded" onclick="selectCard(this)">
+            <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            </div>
+            <div class="p-5"><h3 class="font-semibold text-gray-900 mb-1">Embedded Reviews</h3><p class="text-sm text-gray-500">Add our customizable review workflow within your software or website.</p></div>
           </div>
-          <div class="p-5">
-            <h3 class="font-semibold text-gray-900 mb-1">Event Reviews</h3>
-            <p class="text-sm text-gray-500">Build a landing page specifically for in-person reviewers at events and tradeshows.</p>
-          </div>
-        </div>
 
+          <div class="strategy-card" data-strategy="refresh" onclick="selectCard(this)">
+            <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </div>
+            <div class="p-5"><h3 class="font-semibold text-gray-900 mb-1">Review Refresh Campaign</h3><p class="text-sm text-gray-500">Prompt previous reviewers to update their experience</p></div>
+          </div>
+
+          <div class="strategy-card" data-strategy="email" onclick="selectCard(this)">
+            <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="p-5"><h3 class="font-semibold text-gray-900 mb-1">Email Campaign</h3><p class="text-sm text-gray-500">Reach out to customers with a targeted email campaign</p></div>
+          </div>
+
+          <div class="strategy-card selected" data-strategy="quarterly_contest" onclick="selectCard(this)">
+            <div class="relative flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <div class="check-badge absolute top-3 left-3 flex items-center justify-center rounded-full" style="width:24px;height:24px;background:#6b4de6;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            <div class="p-5"><h3 class="font-semibold text-gray-900 mb-1">Quarterly Review Contest</h3><p class="text-sm text-gray-500">Using custom UTM parameters, compare review generation across people or channels</p></div>
+          </div>
+
+          <div class="strategy-card" data-strategy="event" onclick="selectCard(this)">
+            <div class="flex items-center justify-center" style="height:160px; background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="p-5"><h3 class="font-semibold text-gray-900 mb-1">Event Reviews</h3><p class="text-sm text-gray-500">Build a landing page specifically for in-person reviewers at events and tradeshows.</p></div>
+          </div>
+
+        </div>
+        <div class="flex items-center justify-between mt-10 mx-auto" style="max-width:900px;">
+          <a href="index.html" class="px-6 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100">Cancel</a>
+          <button onclick="goTo('step1')" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white" style="background:#3d2b8e;">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Footer actions -->
-      <div class="flex items-center justify-between mt-10 mx-auto" style="max-width:900px;">
-        <a href="index.html" class="px-6 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
-        <a href="step1.html" id="next-btn" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white" style="background-color:#3d2b8e;">
-          Next
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </a>
+      <!-- ══ VIEW: Step 1/3 ══ -->
+      <div id="view-step1" class="view hidden px-8 py-10">
+        <div class="mx-auto" style="max-width:560px;">
+          <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow:0 4px 24px rgba(107,77,230,0.1); border:1px solid #ede9fe;">
+            <div class="step-illustration">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" style="color:#6b4de6;opacity:0.38;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            <div class="px-8 pt-6 pb-8">
+              <h2 class="text-xl font-bold text-gray-900 mb-1">Quarterly Review Contest</h2>
+              <p class="text-sm text-gray-500 mb-6">Using custom UTM parameters, compare review generation across people or channels</p>
+              <div class="flex gap-1.5 mb-1">
+                <div class="rounded-full h-1.5 flex-1" style="background:#6b4de6;"></div>
+                <div class="rounded-full h-1.5 flex-1" style="background:#e5e7eb;"></div>
+                <div class="rounded-full h-1.5 flex-1" style="background:#e5e7eb;"></div>
+              </div>
+              <p class="text-xs text-gray-400 mb-6">Step 1/3</p>
+              <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Landing Page Name <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span></label>
+                <input id="page-name" type="text" maxlength="40" placeholder="Give your landing page a unique name"
+                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+                  style="transition:border-color 0.15s;"
+                  onfocus="this.style.borderColor='#6b4de6'" onblur="this.style.borderColor='#d1d5db'">
+                <div class="flex justify-between mt-1.5">
+                  <span class="text-xs text-gray-400">Max 40 characters</span>
+                  <span id="char-count" class="text-xs text-gray-400">0 / 40</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <button onclick="goTo('strategy','back')" class="px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+                <button onclick="goTo('step2')" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white" style="background:#3d2b8e;">
+                  Save &amp; Continue <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- ══ VIEW: Step 2/3 ══ -->
+      <div id="view-step2" class="view hidden px-8 py-10">
+        <div class="mx-auto" style="max-width:560px;">
+          <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow:0 4px 24px rgba(107,77,230,0.1); border:1px solid #ede9fe;">
+            <div class="step-illustration" style="gap:12px;">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" style="color:#6b4de6;opacity:0.7;" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" style="color:#6b4de6;opacity:0.7;" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.35;" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <div class="px-8 pt-6 pb-8">
+              <h2 class="text-xl font-bold text-gray-900 mb-1">Create a Review Landing Page</h2>
+              <p class="text-sm text-gray-500 mb-5">Build a custom landing page that gets your reviewers started off on the right foot. Add compelling messaging and incentives along with other customizations.</p>
+              <div class="flex gap-1.5 mb-1">
+                <div class="rounded-full h-1.5 flex-1" style="background:#6b4de6;"></div>
+                <div class="rounded-full h-1.5 flex-1" style="background:#6b4de6;"></div>
+                <div class="rounded-full h-1.5 flex-1" style="background:#e5e7eb;"></div>
+              </div>
+              <p class="text-xs text-gray-400 mb-5">Step 2/3</p>
+              <label class="block text-sm font-medium text-gray-700 mb-3">What type of incentive would you like? <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span></label>
+              <div class="rounded-lg mb-2 overflow-hidden" style="border:1.5px solid #6b4de6;">
+                <div class="flex items-center justify-between px-4 py-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="flex items-center justify-center rounded-full flex-shrink-0" style="width:18px;height:18px;border:2px solid #6b4de6;"><div class="rounded-full" style="width:8px;height:8px;background:#6b4de6;"></div></div>
+                    <span class="text-sm font-medium text-gray-800">Incentivized</span>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                </div>
+                <div class="px-4 pb-4" style="border-top:1px solid #e5e7eb;">
+                  <p class="text-sm text-gray-600 mt-3 mb-2">Would you like to cap the number of reviews you collect for this campaign?</p>
+                  <div class="flex gap-5 mb-4">
+                    <label class="flex items-center gap-1.5 text-sm cursor-pointer"><input type="radio" name="cap" value="no" class="accent-purple-600"> No</label>
+                    <label class="flex items-center gap-1.5 text-sm cursor-pointer"><input type="radio" name="cap" value="yes" checked class="accent-purple-600"> Yes</label>
+                  </div>
+                  <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr;">
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Target Number of Reviews</label>
+                      <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                        <input type="number" value="50" class="flex-1 px-3 py-1.5 text-sm focus:outline-none w-0" style="min-width:0;">
+                        <div class="flex flex-col" style="border-left:1px solid #e5e7eb;">
+                          <button class="px-2 py-0.5 hover:bg-gray-50 text-gray-500 text-xs leading-none">▲</button>
+                          <button class="px-2 py-0.5 hover:bg-gray-50 text-gray-500 text-xs leading-none">▼</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Select Gift Card Type</label>
+                      <select class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none"><option>Visa Global</option><option>Amazon</option><option>Starbucks</option></select>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Select Gift Card Amount</label>
+                      <select class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none"><option>$10.00</option><option>$25.00</option><option>$50.00</option></select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="rounded-lg mb-5" style="border:1px solid #e5e7eb;">
+                <div class="flex items-center justify-between px-4 py-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="rounded-full flex-shrink-0" style="width:18px;height:18px;border:2px solid #d1d5db;"></div>
+                    <span class="text-sm text-gray-600">No Incentive</span>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <button onclick="goTo('strategy','back')" class="px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+                <div class="flex gap-2">
+                  <button onclick="goTo('step1','back')" class="px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">Back</button>
+                  <button onclick="goTo('step3')" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white" style="background:#3d2b8e;">
+                    Save &amp; Continue <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: Step 3/3 ══ -->
+      <div id="view-step3" class="view hidden px-8 py-10">
+        <div class="mx-auto" style="max-width:560px;">
+          <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow:0 4px 24px rgba(107,77,230,0.1); border:1px solid #ede9fe;">
+            <div class="step-illustration" style="gap:12px;">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" style="color:#6b4de6;opacity:0.7;" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" style="color:#6b4de6;opacity:0.7;" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.35;" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <div class="px-8 pt-6 pb-8">
+              <h2 class="text-xl font-bold text-gray-900 mb-1">Create a Review Landing Page</h2>
+              <p class="text-sm text-gray-500 mb-5">Build a custom landing page that gets your reviewers started off on the right foot. Add compelling messaging and incentives along with other customizations.</p>
+              <div class="flex gap-1.5 mb-1">
+                <div class="rounded-full h-1.5 flex-1" style="background:#6b4de6;"></div>
+                <div class="rounded-full h-1.5 flex-1" style="background:#6b4de6;"></div>
+                <div class="rounded-full h-1.5 flex-1" style="background:#6b4de6;"></div>
+              </div>
+              <p class="text-xs text-gray-400 mb-5">Step 3/3</p>
+              <label class="block text-sm font-medium text-gray-700 mb-0.5">Add Your UTM Parameters <span class="text-gray-400 text-xs">ⓘ</span> <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-3">Create a list of keywords you will use to measure the success of each strategy or individual. Incoming reviews will be tagged with these values so you can accurately attribute the source of the review.</p>
+              <p class="text-sm font-medium text-gray-700 mb-3">2 UTM Links Successfully Created</p>
+              <div id="utm-list">
+                <div class="utm-row">
+                  <input type="text" value="ryan" placeholder="Enter UTM parameter/keyword...">
+                  <button class="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 flex-shrink-0" style="color:#3b82f6;">Preview <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></button>
+                  <button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:36px;height:36px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>
+                </div>
+                <div class="utm-row">
+                  <input type="text" value="david" placeholder="Enter UTM parameter/keyword...">
+                  <button class="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 flex-shrink-0" style="color:#3b82f6;">Preview <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></button>
+                  <button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:36px;height:36px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>
+                </div>
+                <div class="utm-row">
+                  <input type="text" placeholder="Enter UTM parameter/keyword...">
+                  <button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:36px;height:36px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>
+                </div>
+              </div>
+              <button onclick="addRow()" class="flex items-center gap-1.5 text-sm font-medium mt-1 mb-6" style="color:#6b4de6;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Parameter
+              </button>
+              <div class="flex items-center justify-between">
+                <button onclick="goTo('strategy','back')" class="px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+                <div class="flex gap-2">
+                  <button onclick="goTo('step2','back')" class="px-5 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">Back</button>
+                  <a href="index.html" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white" style="background:#3d2b8e;">
+                    Create Page <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
 
 <script>
-  let selectedStrategy = 'quarterly_contest';
+  let current = 'strategy';
 
-  function selectCard(el) {
-    // Remove all selections
-    document.querySelectorAll('.strategy-card').forEach(card => {
-      card.classList.remove('selected');
-      // Remove checkmark if present
-      const check = card.querySelector('.check-badge');
-      if (check) check.remove();
+  function goTo(next, direction) {
+    direction = direction || 'forward';
+    const outEl = document.getElementById('view-' + current);
+    const inEl  = document.getElementById('view-' + next);
+
+    // Set incoming off-screen
+    inEl.classList.remove('hidden');
+    inEl.classList.add(direction === 'forward' ? 'entering' : 'entering-back');
+
+    // Force reflow
+    inEl.getBoundingClientRect();
+
+    // Exit current, enter next
+    outEl.classList.add(direction === 'forward' ? 'exiting' : 'exiting-back');
+    inEl.classList.remove('entering', 'entering-back');
+
+    outEl.addEventListener('transitionend', function handler() {
+      outEl.classList.remove('exiting', 'exiting-back');
+      outEl.classList.add('hidden');
+      outEl.removeEventListener('transitionend', handler);
     });
 
-    // Select clicked
-    el.classList.add('selected');
-    selectedStrategy = el.dataset.strategy;
-
-    // Add checkmark
-    const illustration = el.querySelector('div:first-child');
-    if (!illustration.querySelector('.check-badge')) {
-      const badge = document.createElement('div');
-      badge.className = 'check-badge absolute top-3 left-3 flex items-center justify-center rounded-full';
-      badge.style.cssText = 'width:24px;height:24px;background:#6b4de6;';
-      badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
-      illustration.style.position = 'relative';
-      illustration.appendChild(badge);
-    }
+    document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    current = next;
   }
+
+  function selectCard(el) {
+    document.querySelectorAll('.strategy-card').forEach(c => {
+      c.classList.remove('selected');
+      const b = c.querySelector('.check-badge');
+      if (b) b.remove();
+    });
+    el.classList.add('selected');
+    const illus = el.querySelector('div:first-child');
+    illus.style.position = 'relative';
+    const badge = document.createElement('div');
+    badge.className = 'check-badge absolute top-3 left-3 flex items-center justify-center rounded-full';
+    badge.style.cssText = 'width:24px;height:24px;background:#6b4de6;';
+    badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
+    illus.appendChild(badge);
+  }
+
+  document.getElementById('page-name').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = this.value.length + ' / 40';
+  });
+
+  function addRow() {
+    const list = document.getElementById('utm-list');
+    const row = document.createElement('div');
+    row.className = 'utm-row';
+    row.innerHTML = `<input type="text" placeholder="Enter UTM parameter/keyword..."><button onclick="removeRow(this)" class="flex items-center justify-center border border-gray-300 rounded-lg hover:bg-red-50 flex-shrink-0" style="width:36px;height:36px;"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></button>`;
+    list.appendChild(row);
+  }
+  function removeRow(btn) { btn.closest('.utm-row').remove(); }
 </script>
 </body>
 </html>
