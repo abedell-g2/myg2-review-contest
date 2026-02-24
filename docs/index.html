@@ -562,6 +562,19 @@
       dCurrent = 'strategy';
       updateDrawerUI();
       document.getElementById('d-btn-next').disabled = true;
+      // Clear form fields for next use
+      document.getElementById('page-name').value = '';
+      document.getElementById('char-count').textContent = '0 / 40';
+      document.getElementById('email-list').innerHTML = '';
+      document.querySelectorAll('.d-card').forEach(function(c) {
+        c.classList.remove('selected');
+        var b = c.querySelector('.d-check-badge');
+        if (b) b.remove();
+      });
+      // Reset incentive to default state
+      selectIncentive('incentivized');
+      document.querySelector('input[name="cap"][value="no"]').checked = true;
+      document.getElementById('target-reviews-row').style.display = 'none';
     }, 360);
   }
 
@@ -608,7 +621,8 @@
     if (map[dCurrent]) {
       dGoTo(map[dCurrent]);
     } else {
-      closeDrawer(); // step3 → finish
+      createCampaign();
+      closeDrawer();
     }
   }
 
@@ -644,7 +658,7 @@
         document.getElementById('dpb-' + i).style.background = i <= stepNum ? '#6b4de6' : '#e5e7eb';
       });
       backBtn.classList.remove('d-hidden');
-      nextLabel.textContent = dCurrent === 'step3' ? 'Create Page' : 'Save & Continue';
+      nextLabel.textContent = dCurrent === 'step3' ? 'Create Campaign' : 'Save & Continue';
     }
   }
 
@@ -889,6 +903,104 @@
         btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
       }, 2000);
     });
+  }
+
+  // ── Create Campaign ───────────────────────────────────────────────
+  function createCampaign() {
+    // Step 1: page name & strategy
+    var pageName = document.getElementById('page-name').value.trim() || 'New Campaign';
+    var selectedCard = document.querySelector('.d-card.selected');
+    var strategyName = selectedCard ? selectedCard.querySelector('.font-medium').textContent.trim() : 'Review Campaign';
+
+    // Step 2: incentive
+    var incentivized = !document.getElementById('inc-body-incentivized').classList.contains('collapsed');
+    var incentiveAmt = '–';
+    if (incentivized) {
+      var amtSelect = document.querySelectorAll('#inc-body-incentivized select')[1];
+      incentiveAmt = amtSelect ? amtSelect.value : '$25.00';
+    }
+    var yesChecked = document.querySelector('input[name="cap"][value="yes"]').checked;
+    var reviewGoal = yesChecked ? (document.querySelector('#target-reviews-row input').value || '50') + ' reviews' : 'Unlimited';
+
+    // Step 3: emails
+    var emails = Array.from(document.querySelectorAll('#email-list .email-row input'))
+      .map(function(i) { return i.value.trim(); }).filter(Boolean);
+
+    // Mock review counts per team member
+    var totalReviews = 0;
+    var memberData = emails.map(function(email) {
+      var count = Math.floor(Math.random() * 8) + 1;
+      totalReviews += count;
+      return { email: email, name: email.split('@')[0], domain: '@' + (email.split('@')[1] || ''), count: count };
+    });
+
+    var memberRowsHtml = memberData.map(function(m) {
+      var pct = totalReviews > 0 ? Math.round((m.count / totalReviews) * 100) : 0;
+      return '<tr style="border-bottom:1px solid #f3f4f6;">' +
+        '<td style="padding:8px 24px 8px 0;font-size:13px;color:#374151;">' +
+          m.name + '<span style="color:#9ca3af;font-size:11px;">' + m.domain + '</span>' +
+        '</td>' +
+        '<td style="padding:8px 24px 8px 0;font-size:13px;color:#374151;font-weight:500;">' + m.count + '</td>' +
+        '<td style="padding:8px 0;min-width:160px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<div style="flex:1;height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;">' +
+              '<div style="height:100%;background:#6b4de6;border-radius:99px;width:' + pct + '%;"></div>' +
+            '</div>' +
+            '<span style="font-size:11px;color:#9ca3af;width:30px;text-align:right;">' + pct + '%</span>' +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    var chevron = '<svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;transition:transform 0.2s ease;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>';
+
+    var campaignRow =
+      '<tr class="hover:bg-gray-50" style="border-bottom:1px solid #f3f4f6;">' +
+        '<td class="px-6 py-4 font-medium text-gray-900">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<button onclick="toggleCampaignResults(this)" title="View team performance" style="display:flex;align-items:center;justify-content:center;color:#d1d5db;flex-shrink:0;background:none;border:none;cursor:pointer;padding:0;transition:color 0.15s;" onmouseenter="this.style.color=\'#6b4de6\'" onmouseleave="this.style.color=this.closest(\'tr\').nextElementSibling.style.display!==\'none\'?\'#6b4de6\':\'#d1d5db\'">' + chevron + '</button>' +
+            pageName +
+          '</div>' +
+        '</td>' +
+        '<td class="px-4 py-4 text-gray-600">' + (incentivized ? 'Yes' : '–') + '</td>' +
+        '<td class="px-4 py-4 text-gray-600">' + incentiveAmt + '</td>' +
+        '<td class="px-4 py-4 text-gray-600">$0</td>' +
+        '<td class="px-4 py-4 text-gray-600">' + reviewGoal + '</td>' +
+        '<td class="px-4 py-4 text-gray-600">' + strategyName + '</td>' +
+        '<td class="px-4 py-4"><a href="#" class="text-blue-500 hover:underline">Preview</a></td>' +
+        '<td class="px-4 py-4"><span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:#22c55e;border-radius:50%;flex-shrink:0;display:inline-block;"></span><span class="text-gray-700">Active</span></span></td>' +
+        '<td class="px-4 py-4"><a href="#" class="text-blue-500 hover:underline">Edit</a></td>' +
+      '</tr>';
+
+    var detailRow =
+      '<tr class="campaign-detail-row" style="display:none;">' +
+        '<td colspan="9" style="padding:0;background:#fafafa;border-bottom:1px solid #e5e7eb;">' +
+          '<div style="padding:14px 20px 18px 52px;">' +
+            '<p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9ca3af;margin-bottom:10px;">Team Performance</p>' +
+            '<table style="border-collapse:collapse;width:100%;max-width:500px;">' +
+              '<thead><tr>' +
+                '<th style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:6px;padding-right:24px;">Team Member</th>' +
+                '<th style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:6px;padding-right:24px;">Reviews</th>' +
+                '<th style="text-align:left;font-size:11px;font-weight:600;color:#6b7280;padding-bottom:6px;min-width:180px;">Share</th>' +
+              '</tr></thead>' +
+              '<tbody>' + memberRowsHtml + '</tbody>' +
+            '</table>' +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+
+    var tbody = document.querySelector('table tbody');
+    tbody.insertAdjacentHTML('afterbegin', detailRow);
+    tbody.insertAdjacentHTML('afterbegin', campaignRow);
+  }
+
+  function toggleCampaignResults(btn) {
+    var detailRow = btn.closest('tr').nextElementSibling;
+    var isOpen = detailRow.style.display !== 'none';
+    detailRow.style.display = isOpen ? 'none' : 'table-row';
+    var svg = btn.querySelector('svg');
+    svg.style.transform = isOpen ? '' : 'rotate(90deg)';
+    btn.style.color = isOpen ? '#d1d5db' : '#6b4de6';
   }
 </script>
 </body>
