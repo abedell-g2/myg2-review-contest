@@ -148,49 +148,61 @@
     <!-- View: Strategy selection -->
     <div id="dview-strategy" class="dview is-active px-5 py-5">
       <p class="text-sm text-gray-500 mb-4">Choose the type of review campaign you'd like to create.</p>
-      <div class="grid gap-3" style="grid-template-columns:1fr 1fr;">
+      <div class="flex flex-col gap-3">
 
         <div class="d-card" onclick="selectDCard(this)">
-          <div class="relative flex items-center justify-center" style="height:88px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <span class="absolute top-2 right-2 px-1.5 py-0.5 rounded-full font-medium" style="background:#ede9fe;color:#6b4de6;font-size:10px;">Recommended</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <div class="flex items-center gap-4 px-4 py-3">
+            <div class="relative flex items-center justify-center flex-shrink-0 rounded-lg" style="width:52px;height:52px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <span class="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full font-medium" style="background:#ede9fe;color:#6b4de6;font-size:10px;">Recommended</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color:#6b4de6;opacity:0.7;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div><p class="font-medium text-gray-900" style="font-size:13px;">Review Landing Page</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Create a dedicated landing page to capture reviews.</p></div>
           </div>
-          <div class="px-3 py-3"><p class="font-medium text-gray-900" style="font-size:13px;">Review Landing Page</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Create a dedicated landing page to capture reviews.</p></div>
         </div>
 
         <div class="d-card" onclick="selectDCard(this)">
-          <div class="flex items-center justify-center" style="height:88px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+          <div class="flex items-center gap-4 px-4 py-3">
+            <div class="flex items-center justify-center flex-shrink-0 rounded-lg" style="width:52px;height:52px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color:#6b4de6;opacity:0.7;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            </div>
+            <div><p class="font-medium text-gray-900" style="font-size:13px;">Embedded Reviews</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Add our review workflow within your software or site.</p></div>
           </div>
-          <div class="px-3 py-3"><p class="font-medium text-gray-900" style="font-size:13px;">Embedded Reviews</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Add our review workflow within your software or site.</p></div>
         </div>
 
         <div class="d-card" onclick="selectDCard(this)">
-          <div class="flex items-center justify-center" style="height:88px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <div class="flex items-center gap-4 px-4 py-3">
+            <div class="flex items-center justify-center flex-shrink-0 rounded-lg" style="width:52px;height:52px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color:#6b4de6;opacity:0.7;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </div>
+            <div><p class="font-medium text-gray-900" style="font-size:13px;">Review Refresh Campaign</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Prompt previous reviewers to update their experience.</p></div>
           </div>
-          <div class="px-3 py-3"><p class="font-medium text-gray-900" style="font-size:13px;">Review Refresh Campaign</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Prompt previous reviewers to update their experience.</p></div>
         </div>
 
         <div class="d-card" onclick="selectDCard(this)">
-          <div class="flex items-center justify-center" style="height:88px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <div class="flex items-center gap-4 px-4 py-3">
+            <div class="flex items-center justify-center flex-shrink-0 rounded-lg" style="width:52px;height:52px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color:#6b4de6;opacity:0.7;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div><p class="font-medium text-gray-900" style="font-size:13px;">Email Campaign</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Reach out to customers with a targeted email campaign.</p></div>
           </div>
-          <div class="px-3 py-3"><p class="font-medium text-gray-900" style="font-size:13px;">Email Campaign</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Reach out to customers with a targeted email campaign.</p></div>
         </div>
 
         <div class="d-card" onclick="selectDCard(this)">
-          <div class="relative flex items-center justify-center" style="height:88px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <div class="flex items-center gap-4 px-4 py-3">
+            <div class="flex items-center justify-center flex-shrink-0 rounded-lg" style="width:52px;height:52px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color:#6b4de6;opacity:0.7;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            <div><p class="font-medium text-gray-900" style="font-size:13px;">Quarterly Review Contest</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Compare review generation across people or channels.</p></div>
           </div>
-          <div class="px-3 py-3"><p class="font-medium text-gray-900" style="font-size:13px;">Quarterly Review Contest</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Compare review generation across people or channels.</p></div>
         </div>
 
         <div class="d-card" onclick="selectDCard(this)">
-          <div class="flex items-center justify-center" style="height:88px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" style="color:#6b4de6;opacity:0.5;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <div class="flex items-center gap-4 px-4 py-3">
+            <div class="flex items-center justify-center flex-shrink-0 rounded-lg" style="width:52px;height:52px;background:linear-gradient(135deg,#f0f0ff,#e8e0ff);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color:#6b4de6;opacity:0.7;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div><p class="font-medium text-gray-900" style="font-size:13px;">Event Reviews</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Build a landing page for in-person reviewers at events.</p></div>
           </div>
-          <div class="px-3 py-3"><p class="font-medium text-gray-900" style="font-size:13px;">Event Reviews</p><p class="text-gray-500 mt-0.5" style="font-size:11px;">Build a landing page for in-person reviewers at events.</p></div>
         </div>
 
       </div>
